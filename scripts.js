@@ -11,6 +11,34 @@ recipeCloseBtn.addEventListener('click', () => {
     mealDetailsContent.parentElement.classList.remove('showRecipe');
 });
 
+// mealList.addEventListener('click', (event) => {
+//     const likeButton = document.getElementById('buttonForLike');
+//     if (likeButton && likeButton.textContent === 'Like Me') {
+//       likeRecipe(likeButton);
+//     }
+//   });
+  
+//   // Function to handle likes
+//   function likeRecipe(likeButton) {
+//     const mealItem = likeButton.closest('.meal-item');
+//     const recipeName = mealItem.dataset.id;
+  
+//     // Update like status in UI
+//     likeButton.textContent = 'Liked'; // Visually indicate the like
+  
+//     // Fetch and update data in FoodDataset.json (assuming you have a mechanism for this)
+//     fetch(`./FoodDataset.json`)
+//       .then(response => response.json())
+//       .then(data => {
+//         const recipeIndex = data.findIndex(({ TranslatedRecipeName }) => TranslatedRecipeName === recipeName);
+//         data[recipeIndex].Like = true; // Set the 'like' property to true
+  
+//         // Save the updated data back to FoodDataset.json (replace with your actual saving logic)
+//         // ...
+//       })
+//       .catch(error => console.error('Error updating data:', error));
+//   }
+
 // get meal list that matches with the ingredients
 function getMealList(){
     let searchInputTxt = document.getElementById('search-input').value.trim();
@@ -39,11 +67,11 @@ function getMealList(){
                             <p>${recipe.TranslatedInstructions}</p>
                         </div>
                         <div class = "recipe-link">
-                            <a href = "${recipe.URL}" target = "_blank">Watch Video</a>
+                            <a href = "${recipe.URL}" target = "_blank">Click Link to read more!</a>
                         </div>
                         <div>
                         Time Taken: 
-                        ${recipe.TotalTimeInMins}
+                        ${recipe.TotalTimeInMins} minutes
                         </div>
                         </div>
                     </div>
