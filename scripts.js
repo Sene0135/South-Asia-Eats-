@@ -1,94 +1,93 @@
-/**
- * Data Catalog Project Starter Code - SEA Stage 2
- *
- * This file is where you should be doing most of your work. You should
- * also make changes to the HTML and CSS files, but we want you to prioritize
- * demonstrating your understanding of data structures, and you'll do that
- * with the JavaScript code you write in this file.
- * 
- * The comments in this file are only to help you learn how the starter code
- * works. The instructions for the project are in the README. That said, here
- * are the three things you should do first to learn about the starter code:
- * - 1 - Change something small in index.html or style.css, then reload your 
- *    browser and make sure you can see that change. 
- * - 2 - On your browser, right click anywhere on the page and select
- *    "Inspect" to open the browser developer tools. Then, go to the "console"
- *    tab in the new window that opened up. This console is where you will see
- *    JavaScript errors and logs, which is extremely helpful for debugging.
- *    (These instructions assume you're using Chrome, opening developer tools
- *    may be different on other browsers. We suggest using Chrome.)
- * - 3 - Add another string to the titles array a few lines down. Reload your
- *    browser and observe what happens. You should see a fourth "card" appear
- *    with the string you added to the array, but a broken image.
- * 
- */
+const searchBtn = document.getElementById('search-btn');
+const mealList = document.getElementById('meal');
+const mealDetailsContent = document.querySelector('.meal-details-content');
+const recipeCloseBtn = document.getElementById('recipe-close-btn');
 
+// event listeners
+searchBtn.addEventListener('click', getMealList);
+mealList.addEventListener('click', getMealRecipe);
+document.addEventListener('DOMContentLoaded', () => {getRecommendedMeals();});
+recipeCloseBtn.addEventListener('click', () => {
+    mealDetailsContent.parentElement.classList.remove('showRecipe');
+});
 
-const FRESH_PRINCE_URL = "https://upload.wikimedia.org/wikipedia/en/3/33/Fresh_Prince_S1_DVD.jpg";
-const CURB_POSTER_URL = "https://m.media-amazon.com/images/M/MV5BZDY1ZGM4OGItMWMyNS00MDAyLWE2Y2MtZTFhMTU0MGI5ZDFlXkEyXkFqcGdeQXVyMDc5ODIzMw@@._V1_FMjpg_UX1000_.jpg";
-const EAST_LOS_HIGH_POSTER_URL = "https://static.wikia.nocookie.net/hulu/images/6/64/East_Los_High.jpg";
+// get meal list that matches with the ingredients
+function getMealList(){
+    let searchInputTxt = document.getElementById('search-input').value.trim();
+    fetch(`./FoodDataset.json`)
+    .then(response => response.json())
+    .then(data => {
+        let html = "";
+        const recipe = data.find(({ TranslatedRecipeName }) => TranslatedRecipeName === searchInputTxt);
+        const like = recipe.Like
+        console.log(like)
 
-// This is an array of strings (TV show titles)
-let titles = [
-    "Fresh Prince of Bel Air",
-    "Curb Your Enthusiasm",
-    "East Los High"
-];
-// Your final submission should have much more data than this, and 
-// you should use more than just an array of strings to store it all.
-
-
-// This function adds cards the page to display the data in the array
-function showCards() {
-    const cardContainer = document.getElementById("card-container");
-    cardContainer.innerHTML = "";
-    const templateCard = document.querySelector(".card");
-    
-    for (let i = 0; i < titles.length; i++) {
-        let title = titles[i];
-
-        // This part of the code doesn't scale very well! After you add your
-        // own data, you'll need to do something totally different here.
-        let imageURL = "";
-        if (i == 0) {
-            imageURL = FRESH_PRINCE_URL;
-        } else if (i == 1) {
-            imageURL = CURB_POSTER_URL;
-        } else if (i == 2) {
-            imageURL = EAST_LOS_HIGH_POSTER_URL;
+        if(recipe){
+                html += `
+                    <div class = "meal-item" data-id = "${recipe.TranslatedRecipeName}">
+                        <div class = "meal-img">
+                            <img src = "${recipe.image_url}" alt = "food">
+                        </div>
+                        <div class = "meal-name">
+                        <p class = "recipe-category">${recipe.Cuisine}</p>
+                        <div class = "recipe-instruct">
+                            <h3>ingredients:</h3>
+                            <p>${recipe.TranslatedIngredients}</p>
+                        </div>
+                        <div class = "recipe-instruct">
+                            <h3>Instructions:</h3>
+                            <p>${recipe.TranslatedInstructions}</p>
+                        </div>
+                        <div class = "recipe-link">
+                            <a href = "${recipe.URL}" target = "_blank">Watch Video</a>
+                        </div>
+                        <div>
+                        Time Taken: 
+                        ${recipe.TotalTimeInMins}
+                        </div>
+                        </div>
+                    </div>
+                `;
+            mealList.classList.remove('notFound');
+        } else{
+            html = "Sorry, we didn't find any meals!";
+            mealList.classList.add('notFound');
         }
 
-        const nextCard = templateCard.cloneNode(true); // Copy the template card
-        editCardContent(nextCard, title, imageURL); // Edit title and image
-        cardContainer.appendChild(nextCard); // Add new card to the container
-    }
+        mealList.innerHTML = html;
+    });
 }
 
-function editCardContent(card, newTitle, newImageURL) {
-    card.style.display = "block";
 
-    const cardHeader = card.querySelector("h2");
-    cardHeader.textContent = newTitle;
 
-    const cardImage = card.querySelector("img");
-    cardImage.src = newImageURL;
-    cardImage.alt = newTitle + " Poster";
 
-    // You can use console.log to help you debug!
-    // View the output by right clicking on your website,
-    // select "Inspect", then click on the "Console" tab
-    console.log("new card:", newTitle, "- html: ", card);
+
+function getRecommendedMeals() { //shuffle recommended meals to get 3 recommended meals
+    fetch('./FoodDataset.json')
+    .then(response => response.json())
+    .then(data => {
+        const shuffledMeals = data.sort(() => 0.5 - Math.random());
+        const recommendedMeals = shuffledMeals.slice(0, 3);
+        displayRecommendedMeals(recommendedMeals);
+    });
 }
 
-// This calls the addCards() function when the page is first loaded
-document.addEventListener("DOMContentLoaded", showCards);
-
-function quoteAlert() {
-    console.log("Button Clicked!")
-    alert("I guess I can kiss heaven goodbye, because it got to be a sin to look this good!");
+function displayRecommendedMeals(meals) { //display recommended meals from previous function
+    const recommendedMealsContainer = document.getElementById('recommended-meals');
+    let html = '';
+    meals.forEach(meal => {
+        html += `
+            <div class="meal-item" data-id="${meal.TranslatedRecipeName}">
+                <div class="meal-img">
+                    <img src="${meal.image_url}" alt="food">
+                </div>
+                <div class="meal-name">
+                    <h3>${meal.TranslatedRecipeName}</h3>
+                    <a href="#" class="recipe-btn">Get Recipe</a>
+                </div>
+            </div>
+        `;
+    });
+    recommendedMealsContainer.innerHTML = html;
 }
 
-function removeLastCard() {
-    titles.pop(); // Remove last item in titles array
-    showCards(); // Call showCards again to refresh
-}
