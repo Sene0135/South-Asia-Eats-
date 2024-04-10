@@ -32,9 +32,6 @@ recipeCloseBtn.addEventListener('click', () => {
 //       .then(data => {
 //         const recipeIndex = data.findIndex(({ TranslatedRecipeName }) => TranslatedRecipeName === recipeName);
 //         data[recipeIndex].Like = true; // Set the 'like' property to true
-  
-//         // Save the updated data back to FoodDataset.json (replace with your actual saving logic)
-//         // ...
 //       })
 //       .catch(error => console.error('Error updating data:', error));
 //   }
